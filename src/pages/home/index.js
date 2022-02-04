@@ -5,12 +5,31 @@ import './home.css';
 import Menu from '../../components/menu';
 import LinkItem from '../../components/LinkItem';
 
+import api from '../../services/api';
+import { saveLink } from '../../services/storeLinks'
+
 export default function Home() {
   const [link, setLink] = useState('');
-  const []
+  const [data, setData] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
-  function clickLink() {
-    alert("MEU LINK " + link)
+  async function clickLink() {
+    try{
+      const response = await api.post('/shorten', {
+        long_url: link
+      })
+
+      setData(response.data);
+      setShowModal(true);
+
+      saveLink('@encurtaLink', response.data)
+
+      setLink('')
+
+    }catch{
+      alert("Parece que algo deu errado!");
+      setLink('');
+    }
   }
 
 
@@ -35,7 +54,12 @@ export default function Home() {
 
     <Menu/>
 
-    <LinkItem/>
+    { showModal && (
+      <LinkItem
+        closeModal={ () => setShowModal(false) }
+        content={data}
+      />
+    )}
 
   </div>
 
